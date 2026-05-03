@@ -92,6 +92,7 @@ def bucket_names(client) -> set[str]:
 def check_storage(url: str, key: str, bucket: str) -> None:
     try:
         from supabase import create_client
+        import httpx
     except ImportError as exc:
         raise SystemExit("Install project dependencies before testing: task install") from exc
 
@@ -120,6 +121,16 @@ def check_storage(url: str, key: str, bucket: str) -> None:
         downloaded = storage.download(object_path)
         if downloaded != payload:
             raise SystemExit("Supabase Storage download did not match uploaded payload.")
+
+        public_url = storage.get_public_url(object_path)
+        response = httpx.get(public_url, timeout=10)
+        if response.status_code != 200:
+            raise SystemExit(
+                "Supabase Storage public URL is not readable. "
+                f"Got HTTP {response.status_code} for {public_url}"
+            )
+        if response.content != payload:
+            raise SystemExit("Supabase Storage public URL did not return uploaded payload.")
     except SystemExit:
         raise
     except Exception as exc:
@@ -132,7 +143,7 @@ def check_storage(url: str, key: str, bucket: str) -> None:
                 print(f"Warning: could not delete Storage healthcheck object {object_path}: {exc}")
 
     print("Supabase Storage bucket check succeeded.")
-    print(f"Uploaded, downloaded, and deleted: {object_path}")
+    print(f"Uploaded, publicly fetched, downloaded, and deleted: {object_path}")
 
 
 def main() -> None:

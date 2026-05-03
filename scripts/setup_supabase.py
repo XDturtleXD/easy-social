@@ -33,6 +33,8 @@ def main() -> None:
         }
         if bucket not in existing:
             client.storage.create_bucket(bucket, options={"public": True})
+        else:
+            client.storage.update_bucket(bucket, options={"public": True})
 
         print(f"Initialized database and Supabase Storage bucket: {bucket}")
 
