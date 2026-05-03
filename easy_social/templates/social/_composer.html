@@ -1,11 +1,17 @@
 <form method="post" action="{{ url_for('social.create_post') }}" enctype="multipart/form-data" class="composer">
   <textarea name="body" rows="4" maxlength="2000" placeholder="What is happening?"></textarea>
+  <div class="composer-preview" data-media-preview hidden>
+    <div class="composer-preview-frame" data-media-preview-frame></div>
+    <div class="composer-preview-meta">
+      <span data-media-preview-name></span>
+      <button type="button" class="link-button" data-media-preview-clear>Remove</button>
+    </div>
+  </div>
   <div class="composer-actions">
     <label class="file-picker">
       <span>Attach image/video</span>
-      <input type="file" name="media" accept="image/*,video/*">
+      <input type="file" name="media" accept="image/*,video/*" data-media-input>
     </label>
     <button type="submit">Post</button>
   </div>
 </form>
-

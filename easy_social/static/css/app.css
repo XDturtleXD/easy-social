@@ -184,6 +184,49 @@ button.secondary {
   padding: 16px;
 }
 
+.composer-preview {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.composer-preview[hidden] {
+  display: none;
+}
+
+.composer-preview-frame {
+  background: #eef1f4;
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+}
+
+.composer-preview-media {
+  display: block;
+  max-height: 420px;
+  max-width: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.composer-preview-meta {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  display: flex;
+  font-size: 0.92rem;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 9px 12px;
+}
+
+.composer-preview-meta span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .composer-actions,
 .post-actions,
 .profile-header,
@@ -340,4 +383,3 @@ button.secondary {
     flex-direction: column;
   }
 }
-

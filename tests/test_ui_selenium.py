@@ -124,6 +124,41 @@ def logout_via_ui(browser):
     wait_for_text(browser, "Log in")
 
 
+@pytest.mark.parametrize(
+    ("filename", "contents", "expected_tag"),
+    [
+        ("preview.png", b"fake image data", "img"),
+        ("preview.mp4", b"fake video data", "video"),
+    ],
+)
+@pytest.mark.ui
+def test_composer_shows_media_preview_before_posting(
+    browser, live_server, tmp_path, filename, contents, expected_tag
+):
+    register_via_ui(browser, live_server, "previewer")
+    media_path = tmp_path / filename
+    media_path.write_bytes(contents)
+
+    composer = browser.find_element(By.CSS_SELECTOR, "form.composer")
+    media_input = composer.find_element(By.NAME, "media")
+    browser.execute_script("arguments[0].style.display = 'block';", media_input)
+    media_input.send_keys(str(media_path))
+
+    preview = composer.find_element(By.CSS_SELECTOR, "[data-media-preview]")
+    WebDriverWait(browser, 5).until(lambda _: preview.is_displayed())
+    media = preview.find_element(By.CSS_SELECTOR, ".composer-preview-media")
+
+    assert media.tag_name == expected_tag
+    assert media.get_attribute("src").startswith("blob:")
+    assert filename in preview.text
+    if expected_tag == "video":
+        assert media.get_attribute("controls") is not None
+
+    preview.find_element(By.CSS_SELECTOR, "[data-media-preview-clear]").click()
+    WebDriverWait(browser, 5).until(lambda _: not preview.is_displayed())
+    assert media_input.get_attribute("value") == ""
+
+
 @pytest.mark.ui
 def test_user_can_register_create_post_and_comment(browser, live_server):
     register_via_ui(browser, live_server, "alice")
