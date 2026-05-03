@@ -1,0 +1,31 @@
+{% set content = post.display_post %}
+<article class="post">
+  {% if post.is_repost %}
+    <div class="repost-label">Reposted by <a href="{{ url_for('social.profile', username=post.author.username) }}">@{{ post.author.username }}</a></div>
+  {% endif %}
+  <header class="post-header">
+    <div>
+      <a class="username" href="{{ url_for('social.profile', username=content.author.username) }}">@{{ content.author.username }}</a>
+      <span class="muted">{{ content.created_at.strftime("%Y-%m-%d %H:%M") }}</span>
+    </div>
+  </header>
+  {% if content.body %}
+    <p class="post-body">{{ content.body }}</p>
+  {% endif %}
+  {% if content.media_filename %}
+    {% if content.media_type == "image" %}
+      <img class="post-media" src="{{ url_for('static', filename='uploads/' ~ content.media_filename) }}" alt="Post image from {{ content.author.username }}">
+    {% elif content.media_type == "video" %}
+      <video class="post-media" controls src="{{ url_for('static', filename='uploads/' ~ content.media_filename) }}"></video>
+    {% endif %}
+  {% endif %}
+  <footer class="post-actions">
+    <a href="{{ url_for('social.post_detail', post_id=content.id) }}">{{ content.comments.count() }} comments</a>
+    {% if content.author_id != current_user.id %}
+      <form method="post" action="{{ url_for('social.repost', post_id=content.id) }}">
+        <button type="submit" class="link-button">Repost</button>
+      </form>
+    {% endif %}
+  </footer>
+</article>
+

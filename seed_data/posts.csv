@@ -1,0 +1,72 @@
+post_key,username,body,created_at
+alex-01,alex,Sketching a cleaner profile header before lunch.,2026-05-01T09:00:00+00:00
+alex-02,alex,The follow button feels better when the state change is instant.,2026-05-01T10:10:00+00:00
+alex-03,alex,Tried a denser feed card layout and it scans much faster.,2026-05-01T11:20:00+00:00
+alex-04,alex,Keeping avatar sizes consistent fixed three tiny alignment issues.,2026-05-01T12:30:00+00:00
+alex-05,alex,Empty states need one clear action and no ceremony.,2026-05-01T13:40:00+00:00
+alex-06,alex,Muted borders make the post composer feel less heavy.,2026-05-01T14:50:00+00:00
+alex-07,alex,Testing long usernames in every corner of the UI today.,2026-05-01T16:00:00+00:00
+alex-08,alex,Small spacing tweaks made the mobile feed calmer.,2026-05-01T17:10:00+00:00
+blair-01,blair,Added query logging around the home feed endpoint.,2026-05-01T09:05:00+00:00
+blair-02,blair,The database index on created_at already pays for itself.,2026-05-01T10:15:00+00:00
+blair-03,blair,Repost rows are simpler than duplicating original post content.,2026-05-01T11:25:00+00:00
+blair-04,blair,Writing importer checks before seeding anything permanent.,2026-05-01T12:35:00+00:00
+blair-05,blair,SQLite is plenty for this demo but the app shape can grow.,2026-05-01T13:45:00+00:00
+blair-06,blair,Made a note to profile follower joins with larger sample data.,2026-05-01T14:55:00+00:00
+casey-01,casey,New users understand the feed faster when follows already exist.,2026-05-01T09:10:00+00:00
+casey-02,casey,The first comment often sets the tone for the whole thread.,2026-05-01T10:20:00+00:00
+casey-03,casey,Community prompts work best when they sound specific.,2026-05-01T11:30:00+00:00
+casey-04,casey,Collecting examples of helpful repost behavior today.,2026-05-01T12:40:00+00:00
+casey-05,casey,Profiles need enough bio context to make follows feel natural.,2026-05-01T13:50:00+00:00
+casey-06,casey,People notice when the feed feels alive on first open.,2026-05-01T15:00:00+00:00
+casey-07,casey,Seed data should create conversations without looking scripted.,2026-05-01T16:10:00+00:00
+devon-01,devon,Fixed a tap target that was just a little too small.,2026-05-01T09:15:00+00:00
+devon-02,devon,The mobile nav feels better after trimming one extra label.,2026-05-01T10:25:00+00:00
+devon-03,devon,Testing upload flows on a slow network emulator.,2026-05-01T11:35:00+00:00
+devon-04,devon,Local video previews caught a file type bug early.,2026-05-01T12:45:00+00:00
+devon-05,devon,Keyboard focus order is part of the feature.,2026-05-01T13:55:00+00:00
+emery-01,emery,Launched a tiny experiment with invite-only onboarding.,2026-05-01T09:20:00+00:00
+emery-02,emery,A small social graph makes demos feel instantly more real.,2026-05-01T10:30:00+00:00
+emery-03,emery,The best seed data tells you what to click next.,2026-05-01T11:40:00+00:00
+emery-04,emery,Trying three different bio styles for new accounts.,2026-05-01T12:50:00+00:00
+emery-05,emery,Reposts are a useful signal for discovery before search exists.,2026-05-01T14:00:00+00:00
+emery-06,emery,Demo accounts should use memorable names and plain passwords.,2026-05-01T15:10:00+00:00
+emery-07,emery,Adding realistic timestamps makes the feed sort easier to inspect.,2026-05-01T16:20:00+00:00
+emery-08,emery,The explore page needs enough variety to reward browsing.,2026-05-01T17:30:00+00:00
+emery-09,emery,Shipping small data fixtures beats explaining an empty app.,2026-05-01T18:40:00+00:00
+finley-01,finley,Counting posts per seeded user before I trust the fixture.,2026-05-01T09:25:00+00:00
+finley-02,finley,Random follows still need guardrails against self follows.,2026-05-01T10:35:00+00:00
+finley-03,finley,A balanced graph shows feed behavior better than a star graph.,2026-05-01T11:45:00+00:00
+finley-04,finley,Import summaries should print counts that can be checked quickly.,2026-05-01T12:55:00+00:00
+finley-05,finley,Stable timestamps keep test runs comparable.,2026-05-01T14:05:00+00:00
+finley-06,finley,CSV remains the easiest fixture format for non-engineers to edit.,2026-05-01T15:15:00+00:00
+gray-01,gray,Support inbox themes are turning into product tasks.,2026-05-01T09:30:00+00:00
+gray-02,gray,Users ask for clarity before they ask for more features.,2026-05-01T10:40:00+00:00
+gray-03,gray,The fastest bug reports include a screenshot and exact route.,2026-05-01T11:50:00+00:00
+gray-04,gray,Seed accounts help support rehearse realistic walkthroughs.,2026-05-01T13:00:00+00:00
+gray-05,gray,Following someone should never feel like a dead end.,2026-05-01T14:10:00+00:00
+gray-06,gray,Repost context makes the feed easier to explain in demos.,2026-05-01T15:20:00+00:00
+gray-07,gray,Writing down confusing moments before they become tickets.,2026-05-01T16:30:00+00:00
+gray-08,gray,Good sample data gives QA more paths through the app.,2026-05-01T17:40:00+00:00
+harper-01,harper,Drafting a short guide to what makes a good first post.,2026-05-01T09:35:00+00:00
+harper-02,harper,Plain language always wins inside small product surfaces.,2026-05-01T10:45:00+00:00
+harper-03,harper,A profile bio can be useful without becoming a resume.,2026-05-01T11:55:00+00:00
+harper-04,harper,The feed feels better when every post has a point of view.,2026-05-01T13:05:00+00:00
+harper-05,harper,Reposting is endorsement plus a little bit of navigation.,2026-05-01T14:15:00+00:00
+indigo-01,indigo,Trying duplicate imports to make sure rows stay stable.,2026-05-01T09:40:00+00:00
+indigo-02,indigo,The check constraint caught an empty post exactly as intended.,2026-05-01T10:50:00+00:00
+indigo-03,indigo,Every fixture needs at least one boring verification path.,2026-05-01T12:00:00+00:00
+indigo-04,indigo,Testing repost rendering from both feed and profile pages.,2026-05-01T13:10:00+00:00
+indigo-05,indigo,The import script should fail loudly on missing references.,2026-05-01T14:20:00+00:00
+indigo-06,indigo,Running the command twice is a real acceptance test.,2026-05-01T15:30:00+00:00
+indigo-07,indigo,Fixture data is production code when demos depend on it.,2026-05-01T16:40:00+00:00
+jordan-01,jordan,Built my first local Flask route and it actually works.,2026-05-01T09:45:00+00:00
+jordan-02,jordan,Following people makes the feed feel less lonely right away.,2026-05-01T10:55:00+00:00
+jordan-03,jordan,Trying to understand how reposts point back to originals.,2026-05-01T12:05:00+00:00
+jordan-04,jordan,Small apps are the best way to learn database relationships.,2026-05-01T13:15:00+00:00
+jordan-05,jordan,Added a note about keeping seed passwords obvious in demos.,2026-05-01T14:25:00+00:00
+jordan-06,jordan,The explore page is where I find accounts to follow.,2026-05-01T15:35:00+00:00
+jordan-07,jordan,Reading model code made the UI behavior easier to predict.,2026-05-01T16:45:00+00:00
+jordan-08,jordan,Trying to keep each demo post short and believable.,2026-05-01T17:55:00+00:00
+jordan-09,jordan,SQLite files are nice because you can throw them away and retry.,2026-05-01T19:05:00+00:00
+jordan-10,jordan,Tomorrow I want to add comments to the seed set too.,2026-05-01T20:15:00+00:00

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Register - Easy Social{% endblock %}
+{% block content %}
+  <section class="auth-panel">
+    <h1>Create account</h1>
+    <form method="post" class="form-stack">
+      <label>
+        Username
+        <input name="username" maxlength="40" autocomplete="username" required>
+      </label>
+      <label>
+        Email
+        <input name="email" type="email" autocomplete="email" required>
+      </label>
+      <label>
+        Password
+        <input name="password" type="password" autocomplete="new-password" required>
+      </label>
+      <button type="submit">Register</button>
+    </form>
+    <p class="muted">Already registered? <a href="{{ url_for('auth.login') }}">Log in</a>.</p>
+  </section>
+{% endblock %}
+

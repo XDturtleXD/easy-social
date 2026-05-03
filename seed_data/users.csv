@@ -1,0 +1,11 @@
+username,email,password,bio,created_at
+alex,alex@example.test,password123,Product designer collecting small interface details.,2026-05-01T08:00:00+00:00
+blair,blair@example.test,password123,Backend engineer who likes observability and coffee.,2026-05-01T08:03:00+00:00
+casey,casey@example.test,password123,Community manager testing social product loops.,2026-05-01T08:06:00+00:00
+devon,devon@example.test,password123,Mobile developer posting short build notes.,2026-05-01T08:09:00+00:00
+emery,emery@example.test,password123,Indie founder sharing launch experiments.,2026-05-01T08:12:00+00:00
+finley,finley@example.test,password123,Data analyst tracking content patterns.,2026-05-01T08:15:00+00:00
+gray,gray@example.test,password123,Support lead turning feedback into fixes.,2026-05-01T08:18:00+00:00
+harper,harper@example.test,password123,Writer exploring practical social apps.,2026-05-01T08:21:00+00:00
+indigo,indigo@example.test,password123,QA engineer checking every edge case twice.,2026-05-01T08:24:00+00:00
+jordan,jordan@example.test,password123,Student building tiny web projects after class.,2026-05-01T08:27:00+00:00

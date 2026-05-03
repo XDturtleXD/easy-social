@@ -1,0 +1,47 @@
+version: "3"
+
+vars:
+  FLASK_APP: easy_social
+  PORT: 5000
+
+tasks:
+  install:
+    desc: Install project dependencies with Poetry
+    cmds:
+      - poetry install
+
+  init-db:
+    desc: Initialize the local SQLite database
+    cmds:
+      - poetry run flask --app {{.FLASK_APP}} init-db
+
+  import-fake-data:
+    desc: Import fake users, follows, posts, comments, and reposts from seed data
+    cmds:
+      - poetry run python scripts/import_fake_data.py
+
+  run:
+    desc: Run the Flask development server
+    cmds:
+      - poetry run flask --app {{.FLASK_APP}} run --port {{.PORT}}
+
+  test:
+    desc: Run the test suite
+    cmds:
+      - poetry run pytest
+
+  shell:
+    desc: Open a Poetry shell
+    cmds:
+      - poetry shell
+
+  routes:
+    desc: Show Flask routes
+    cmds:
+      - poetry run flask --app {{.FLASK_APP}} routes
+
+  clean:
+    desc: Remove local Python caches and pytest cache
+    cmds:
+      - find . -type d -name __pycache__ -prune -exec rm -rf {} +
+      - rm -rf .pytest_cache

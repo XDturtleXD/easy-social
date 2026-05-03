@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Post - Easy Social{% endblock %}
+{% block content %}
+  <section class="main-column">
+    {% include "social/_post.html" %}
+    <form method="post" action="{{ url_for('social.add_comment', post_id=post.display_post.id) }}" class="comment-form">
+      <textarea name="body" rows="3" maxlength="1000" placeholder="Write a comment"></textarea>
+      <button type="submit">Comment</button>
+    </form>
+    <div class="comments">
+      <h2>Comments</h2>
+      {% for comment in comments %}
+        <article class="comment">
+          <a class="username" href="{{ url_for('social.profile', username=comment.author.username) }}">@{{ comment.author.username }}</a>
+          <p>{{ comment.body }}</p>
+          <span class="muted">{{ comment.created_at.strftime("%Y-%m-%d %H:%M") }}</span>
+        </article>
+      {% else %}
+        <p class="empty-state">No comments yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
+

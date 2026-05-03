@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Explore - Easy Social{% endblock %}
+{% block content %}
+  <section class="layout with-sidebar">
+    <div class="main-column">
+      <h1>Explore</h1>
+      <div class="post-list">
+        {% for post in posts %}
+          {% include "social/_post.html" %}
+        {% else %}
+          <p class="empty-state">No posts yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+    <aside class="sidebar">
+      <h2>People</h2>
+      {% for user in users %}
+        <div class="user-row">
+          <a href="{{ url_for('social.profile', username=user.username) }}">@{{ user.username }}</a>
+          {% if current_user.is_following(user) %}
+            <form method="post" action="{{ url_for('social.unfollow', username=user.username) }}">
+              <button type="submit" class="secondary">Unfollow</button>
+            </form>
+          {% else %}
+            <form method="post" action="{{ url_for('social.follow', username=user.username) }}">
+              <button type="submit">Follow</button>
+            </form>
+          {% endif %}
+        </div>
+      {% else %}
+        <p class="muted">No other users yet.</p>
+      {% endfor %}
+    </aside>
+  </section>
+{% endblock %}
+

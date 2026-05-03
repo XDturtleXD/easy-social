@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "easy-social"
+version = "0.1.0"
+description = "A compact Twitter-like social media platform built with Flask."
+authors = ["easy-social contributors"]
+readme = "README.md"
+packages = [{ include = "easy_social" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+flask = "^3.0.0"
+flask-sqlalchemy = "^3.1.1"
+flask-login = "^0.6.3"
+flask-migrate = "^4.0.7"
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
