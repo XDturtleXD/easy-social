@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from flask import Flask
 from sqlalchemy.pool import NullPool
@@ -11,10 +12,37 @@ from .media import media_url
 from .models import User
 
 
+def _validate_database_url(database_url: str) -> None:
+    if not database_url:
+        return
+    if "[YOUR-PASSWORD]" in database_url:
+        raise ValueError(
+            "DATABASE_URL still contains [YOUR-PASSWORD]. Replace it with the "
+            "Supabase database password from Project Settings > Database."
+        )
+
+    parsed = urlsplit(database_url)
+    if not parsed.hostname or not parsed.hostname.endswith(".pooler.supabase.com"):
+        return
+
+    if parsed.username == "postgres":
+        raise ValueError(
+            "Supabase pooler DATABASE_URL must use username "
+            "postgres.<project-ref>, not postgres. Copy the transaction pooler "
+            "connection string from Supabase Project Settings > Database."
+        )
+    if not parsed.password:
+        raise ValueError(
+            "Supabase pooler DATABASE_URL is missing a password. Use the "
+            "database password from Supabase Project Settings > Database."
+        )
+
+
 def _database_url() -> str:
     database_url = os.environ.get("DATABASE_URL")
     if not database_url:
         return ""
+    _validate_database_url(database_url)
     if database_url.startswith("postgres://"):
         return database_url.replace("postgres://", "postgresql+psycopg://", 1)
     if database_url.startswith("postgresql://"):

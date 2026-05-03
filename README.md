@@ -51,11 +51,22 @@ SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 SUPABASE_STORAGE_BUCKET=easy-social-media
 ```
 
-Initialize Supabase from your machine after installing `requirements.txt` and exporting the same variables:
+Initialize Supabase from your machine after installing Poetry dependencies and exporting the same variables:
 
 ```bash
-python scripts/setup_supabase.py
+task install
+task setup-supabase
 ```
+
+## Supabase Connection Check
+
+To test the local `.env` database and Storage bucket credentials without starting the app:
+
+```bash
+task test-supabase-connection
+```
+
+This command connects to Supabase Postgres, confirms the configured Storage bucket exists, then uploads, downloads, and deletes a small healthcheck object.
 
 Deploy with the Vercel CLI or connect the Git repository in Vercel:
 

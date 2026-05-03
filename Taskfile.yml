@@ -20,6 +20,11 @@ tasks:
     cmds:
       - poetry run python scripts/import_fake_data.py
 
+  setup-supabase:
+    desc: Initialize Supabase tables and Storage bucket
+    cmds:
+      - poetry run python scripts/setup_supabase.py
+
   run:
     desc: Run the Flask development server
     cmds:
@@ -44,6 +49,11 @@ tasks:
     desc: Run Selenium UI tests
     cmds:
       - poetry run pytest -m ui
+
+  test-supabase-connection:
+    desc: Test Supabase Postgres and Storage with local .env credentials
+    cmds:
+      - poetry run python scripts/check_supabase_connection.py
 
   shell:
     desc: Open a Poetry shell
