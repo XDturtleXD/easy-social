@@ -10,7 +10,7 @@ A small Twitter-like social media app built with Flask.
 - Comment on posts.
 - Follow and unfollow users.
 - View a personalized feed from yourself and people you follow.
-- Local media uploads with extension-based image/video validation.
+- Media uploads with extension-based image/video validation.
 
 ## Setup
 
@@ -30,6 +30,40 @@ Useful environment variables:
 SECRET_KEY=change-me
 DATABASE_URL=sqlite:////absolute/path/to/db.sqlite
 ```
+
+## Vercel and Supabase
+
+This repo includes Vercel and Supabase deployment wiring:
+
+- `app.py` exposes the Flask app for Vercel.
+- `vercel.json` excludes tests and local data from the function bundle.
+- `requirements.txt` lists runtime dependencies for Vercel, including Postgres and Supabase Storage clients.
+- `scripts/setup_supabase.py` creates the app tables and the public Storage bucket.
+
+Create a Supabase project, then use its transaction pooler connection string for Vercel because Vercel runs the app as serverless functions. Set these environment variables in Vercel:
+
+```bash
+SECRET_KEY=use-a-long-random-value
+DATABASE_URL=postgres://postgres.<project-ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres
+MEDIA_STORAGE_BACKEND=supabase
+SUPABASE_URL=https://<project-ref>.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
+SUPABASE_STORAGE_BUCKET=easy-social-media
+```
+
+Initialize Supabase from your machine after installing `requirements.txt` and exporting the same variables:
+
+```bash
+python scripts/setup_supabase.py
+```
+
+Deploy with the Vercel CLI or connect the Git repository in Vercel:
+
+```bash
+vercel deploy
+```
+
+The Supabase bucket is created as public so post media can be rendered directly in feeds. Keep `SUPABASE_SERVICE_ROLE_KEY` server-side only; do not expose it in client JavaScript.
 
 To load sample users, follows, posts, comments, and reposts:
 

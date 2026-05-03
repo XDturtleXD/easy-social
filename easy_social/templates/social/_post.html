@@ -14,9 +14,9 @@
   {% endif %}
   {% if content.media_filename %}
     {% if content.media_type == "image" %}
-      <img class="post-media" src="{{ url_for('static', filename='uploads/' ~ content.media_filename) }}" alt="Post image from {{ content.author.username }}">
+      <img class="post-media" src="{{ media_url(content.media_filename) }}" alt="Post image from {{ content.author.username }}">
     {% elif content.media_type == "video" %}
-      <video class="post-media" controls src="{{ url_for('static', filename='uploads/' ~ content.media_filename) }}"></video>
+      <video class="post-media" controls src="{{ media_url(content.media_filename) }}"></video>
     {% endif %}
   {% endif %}
   <footer class="post-actions">
@@ -28,4 +28,3 @@
     {% endif %}
   </footer>
 </article>
-

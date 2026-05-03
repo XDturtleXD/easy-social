@@ -4,29 +4,62 @@ import os
 from pathlib import Path
 
 from flask import Flask
+from sqlalchemy.pool import NullPool
 
 from .extensions import db, login_manager, migrate
+from .media import media_url
 from .models import User
+
+
+def _database_url() -> str:
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        return ""
+    if database_url.startswith("postgres://"):
+        return database_url.replace("postgres://", "postgresql+psycopg://", 1)
+    if database_url.startswith("postgresql://"):
+        return database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return database_url
+
+
+def _engine_options(database_url: str) -> dict:
+    if not database_url.startswith("postgresql"):
+        return {}
+    return {
+        "pool_pre_ping": True,
+        "poolclass": NullPool,
+        "connect_args": {"prepare_threshold": None},
+    }
 
 
 def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__, instance_relative_config=True)
+    database_url = _database_url()
     app.config.from_mapping(
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-secret-key"),
-        SQLALCHEMY_DATABASE_URI=os.environ.get(
-            "DATABASE_URL",
-            f"sqlite:///{Path(app.instance_path) / 'easy_social.sqlite'}",
-        ),
+        SQLALCHEMY_DATABASE_URI=database_url
+        or f"sqlite:///{Path(app.instance_path) / 'easy_social.sqlite'}",
+        SQLALCHEMY_ENGINE_OPTIONS=_engine_options(database_url),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         UPLOAD_FOLDER=str(Path(app.root_path) / "static" / "uploads"),
         MAX_CONTENT_LENGTH=50 * 1024 * 1024,
+        MEDIA_STORAGE_BACKEND=os.environ.get("MEDIA_STORAGE_BACKEND", "local"),
+        SUPABASE_URL=os.environ.get("SUPABASE_URL"),
+        SUPABASE_SERVICE_ROLE_KEY=os.environ.get("SUPABASE_SERVICE_ROLE_KEY"),
+        SUPABASE_STORAGE_BUCKET=os.environ.get("SUPABASE_STORAGE_BUCKET", "easy-social-media"),
     )
 
     if test_config:
         app.config.update(test_config)
+        if "SQLALCHEMY_ENGINE_OPTIONS" not in test_config:
+            app.config["SQLALCHEMY_ENGINE_OPTIONS"] = _engine_options(
+                app.config["SQLALCHEMY_DATABASE_URI"]
+            )
 
-    Path(app.instance_path).mkdir(parents=True, exist_ok=True)
-    Path(app.config["UPLOAD_FOLDER"]).mkdir(parents=True, exist_ok=True)
+    if app.config["SQLALCHEMY_DATABASE_URI"].startswith("sqlite:///"):
+        Path(app.instance_path).mkdir(parents=True, exist_ok=True)
+    if app.config["MEDIA_STORAGE_BACKEND"] == "local":
+        Path(app.config["UPLOAD_FOLDER"]).mkdir(parents=True, exist_ok=True)
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -42,6 +75,7 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(social_bp)
+    app.jinja_env.globals["media_url"] = media_url
 
     @app.cli.command("init-db")
     def init_db_command() -> None:
@@ -49,4 +83,3 @@ def create_app(test_config: dict | None = None) -> Flask:
         print("Initialized the database.")
 
     return app
-
