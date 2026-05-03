@@ -18,6 +18,7 @@ def app():
                 "SECRET_KEY": "test",
                 "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
                 "UPLOAD_FOLDER": str(Path(temp_dir) / "uploads"),
+                "MEDIA_STORAGE_BACKEND": "local",
                 "WTF_CSRF_ENABLED": False,
             }
         )
@@ -53,4 +54,3 @@ def login(client, username_or_email: str, password: str = "password"):
 
 def logout(client):
     return client.post("/auth/logout", follow_redirects=True)
-

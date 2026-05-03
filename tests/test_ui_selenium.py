@@ -31,6 +31,7 @@ def ui_app():
                 "SECRET_KEY": "test",
                 "SQLALCHEMY_DATABASE_URI": f"sqlite:///{temp_path / 'ui.sqlite'}",
                 "UPLOAD_FOLDER": str(temp_path / "uploads"),
+                "MEDIA_STORAGE_BACKEND": "local",
                 "WTF_CSRF_ENABLED": False,
             }
         )

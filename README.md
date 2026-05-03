@@ -36,7 +36,7 @@ DATABASE_URL=sqlite:////absolute/path/to/db.sqlite
 This repo includes Vercel and Supabase deployment wiring:
 
 - `app.py` exposes the Flask app for Vercel.
-- `vercel.json` excludes tests and local data from the function bundle.
+- `vercel.json` keeps Vercel project configuration in the repo.
 - `requirements.txt` lists runtime dependencies for Vercel, including Postgres and Supabase Storage clients.
 - `scripts/setup_supabase.py` creates the app tables and the public Storage bucket.
 
