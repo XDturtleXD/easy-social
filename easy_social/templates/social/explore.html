@@ -17,7 +17,7 @@
       {% for user in users %}
         <div class="user-row">
           <a href="{{ url_for('social.profile', username=user.username) }}">@{{ user.username }}</a>
-          {% if current_user.is_following(user) %}
+          {% if user.id in followed_user_ids %}
             <form method="post" action="{{ url_for('social.unfollow', username=user.username) }}">
               <button type="submit" class="secondary">Unfollow</button>
             </form>
@@ -33,4 +33,3 @@
     </aside>
   </section>
 {% endblock %}
-

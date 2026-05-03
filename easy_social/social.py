@@ -2,13 +2,53 @@ from __future__ import annotations
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from sqlalchemy import desc, or_
+from sqlalchemy import desc, func, or_
+from sqlalchemy.orm import joinedload
 
 from .extensions import db
 from .media import save_media
 from .models import Comment, Post, User, followers
 
 bp = Blueprint("social", __name__)
+
+
+def _post_query():
+    return Post.query.options(
+        joinedload(Post.author),
+        joinedload(Post.repost_of).joinedload(Post.author),
+    )
+
+
+def _comment_counts_for_posts(posts: list[Post]) -> dict[int, int]:
+    post_ids = {post.display_post.id for post in posts}
+    if not post_ids:
+        return {}
+
+    counts = dict.fromkeys(post_ids, 0)
+    rows = (
+        db.session.query(Comment.post_id, func.count(Comment.id))
+        .filter(Comment.post_id.in_(post_ids))
+        .group_by(Comment.post_id)
+        .all()
+    )
+    counts.update({post_id: count for post_id, count in rows})
+    return counts
+
+
+def _followed_user_ids(users: list[User]) -> set[int]:
+    user_ids = [user.id for user in users]
+    if not user_ids:
+        return set()
+
+    return {
+        followed_id
+        for (followed_id,) in db.session.query(followers.c.followed_id)
+        .filter(
+            followers.c.follower_id == current_user.id,
+            followers.c.followed_id.in_(user_ids),
+        )
+        .all()
+    }
 
 
 @bp.route("/")
@@ -18,20 +58,31 @@ def feed():
         followers.c.follower_id == current_user.id
     )
     posts = (
-        Post.query.filter(or_(Post.author_id == current_user.id, Post.author_id.in_(followed_ids)))
+        _post_query()
+        .filter(or_(Post.author_id == current_user.id, Post.author_id.in_(followed_ids)))
         .order_by(desc(Post.created_at))
         .limit(100)
         .all()
     )
-    return render_template("social/feed.html", posts=posts)
+    return render_template(
+        "social/feed.html",
+        posts=posts,
+        comment_counts=_comment_counts_for_posts(posts),
+    )
 
 
 @bp.route("/explore")
 @login_required
 def explore():
-    posts = Post.query.order_by(desc(Post.created_at)).limit(100).all()
+    posts = _post_query().order_by(desc(Post.created_at)).limit(100).all()
     users = User.query.filter(User.id != current_user.id).order_by(User.username).limit(50).all()
-    return render_template("social/explore.html", posts=posts, users=users)
+    return render_template(
+        "social/explore.html",
+        posts=posts,
+        users=users,
+        comment_counts=_comment_counts_for_posts(posts),
+        followed_user_ids=_followed_user_ids(users),
+    )
 
 
 @bp.post("/posts")
@@ -63,9 +114,14 @@ def create_post():
 @bp.get("/posts/<int:post_id>")
 @login_required
 def post_detail(post_id: int):
-    post = db.get_or_404(Post, post_id)
+    post = _post_query().filter(Post.id == post_id).first_or_404()
     comments = post.comments.order_by(Comment.created_at.asc()).all()
-    return render_template("social/post_detail.html", post=post, comments=comments)
+    return render_template(
+        "social/post_detail.html",
+        post=post,
+        comments=comments,
+        comment_counts={post.display_post.id: len(comments)},
+    )
 
 
 @bp.post("/posts/<int:post_id>/comments")
@@ -103,8 +159,18 @@ def repost(post_id: int):
 @login_required
 def profile(username: str):
     user = User.query.filter_by(username=username).first_or_404()
-    posts = user.posts.order_by(desc(Post.created_at)).all()
-    return render_template("social/profile.html", profile_user=user, posts=posts)
+    posts = (
+        _post_query()
+        .filter(Post.author_id == user.id)
+        .order_by(desc(Post.created_at))
+        .all()
+    )
+    return render_template(
+        "social/profile.html",
+        profile_user=user,
+        posts=posts,
+        comment_counts=_comment_counts_for_posts(posts),
+    )
 
 
 @bp.post("/users/<username>/follow")

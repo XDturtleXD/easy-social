@@ -20,7 +20,7 @@
     {% endif %}
   {% endif %}
   <footer class="post-actions">
-    <a href="{{ url_for('social.post_detail', post_id=content.id) }}">{{ content.comments.count() }} comments</a>
+    <a href="{{ url_for('social.post_detail', post_id=content.id) }}">{{ comment_counts[content.id] if comment_counts is defined and content.id in comment_counts else content.comments.count() }} comments</a>
     {% if content.author_id != current_user.id %}
       <form method="post" action="{{ url_for('social.repost', post_id=content.id) }}">
         <button type="submit" class="link-button">Repost</button>

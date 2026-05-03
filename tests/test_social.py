@@ -3,7 +3,9 @@ from __future__ import annotations
 from io import BytesIO
 
 import pytest
+from sqlalchemy import event
 
+from easy_social.extensions import db
 from easy_social.models import Comment, Post, User
 from scripts.import_fake_data import DEFAULT_DATA_DIR, import_fake_data
 
@@ -90,6 +92,39 @@ def test_repost_and_comment(client, app):
         assert repost.author.username == "bob"
         assert comment.body == "Nice post"
         assert comment.post_id == original_id
+
+
+def test_explore_batches_comment_counts_and_follow_state(client, app):
+    register(client, "alice")
+
+    with app.app_context():
+        alice = User.query.filter_by(username="alice").one()
+        for index in range(8):
+            user = User(username=f"user{index}", email=f"user{index}@example.com")
+            user.set_password("password")
+            post = Post(author=user, body=f"Post {index}")
+            db.session.add_all([user, post])
+            db.session.flush()
+            db.session.add(Comment(author=alice, post=post, body=f"Comment {index}"))
+            if index % 2 == 0:
+                alice.follow(user)
+        db.session.commit()
+
+    statements = []
+
+    def track_statement(conn, cursor, statement, parameters, context, executemany):
+        statements.append(statement)
+
+    with app.app_context():
+        event.listen(db.engine, "before_cursor_execute", track_statement)
+        try:
+            response = client.get("/explore")
+        finally:
+            event.remove(db.engine, "before_cursor_execute", track_statement)
+
+    assert response.status_code == 200
+    assert b"Post 0" in response.data
+    assert len(statements) <= 8
 
 
 def test_import_fake_data_adds_comments_to_each_seed_post(app):
