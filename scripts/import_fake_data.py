@@ -2,15 +2,21 @@ from __future__ import annotations
 
 import argparse
 import csv
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
-from easy_social import create_app
+from dotenv import load_dotenv
+
+from easy_social import _validate_database_url, create_app
 from easy_social.extensions import db
 from easy_social.models import Comment, Post, User
 
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[1] / "seed_data"
+DEFAULT_ENV_FILE = Path(".env")
+LEGACY_ENV_FILE = Path("env")
 
 COMMENT_TEMPLATES = [
     "This makes the thread feel much easier to follow.",
@@ -19,6 +25,29 @@ COMMENT_TEMPLATES = [
     "I like how specific this is without making the post too long.",
     "This is exactly the kind of sample conversation the feed needed.",
 ]
+
+
+def env_file_path(value: str | None) -> Path:
+    if value:
+        return Path(value)
+    if DEFAULT_ENV_FILE.exists():
+        return DEFAULT_ENV_FILE
+    return LEGACY_ENV_FILE
+
+
+def masked_url(database_url: str) -> str:
+    parsed = urlsplit(database_url)
+    if not parsed.username:
+        return database_url
+
+    host = parsed.hostname or ""
+    if parsed.port:
+        host = f"{host}:{parsed.port}"
+
+    username = parsed.username
+    password = ":***" if parsed.password else ""
+    netloc = f"{username}{password}@{host}"
+    return urlunsplit((parsed.scheme, netloc, parsed.path, parsed.query, parsed.fragment))
 
 
 def parse_timestamp(value: str) -> datetime:
@@ -165,7 +194,23 @@ def main() -> None:
         default=DEFAULT_DATA_DIR,
         help=f"Directory containing seed CSV files. Defaults to {DEFAULT_DATA_DIR}.",
     )
+    parser.add_argument(
+        "--env-file",
+        help="Path to the dotenv file to load. Defaults to .env, or env if .env is absent.",
+    )
     args = parser.parse_args()
+
+    dotenv_path = env_file_path(args.env_file)
+    if dotenv_path.exists():
+        load_dotenv(dotenv_path=dotenv_path, override=False)
+        print(f"Loaded credentials from: {dotenv_path}")
+
+    database_url = os.environ.get("DATABASE_URL", "")
+    if database_url:
+        _validate_database_url(database_url)
+        print(f"Import target DATABASE_URL: {masked_url(database_url)}")
+    else:
+        print("Import target DATABASE_URL: local SQLite default")
 
     app = create_app()
     with app.app_context():

@@ -82,6 +82,8 @@ To load sample users, follows, posts, comments, and reposts:
 task import-fake-data
 ```
 
+The import task loads local `.env` credentials when present, so it imports into Supabase when `DATABASE_URL` points at the Supabase database. If no `DATABASE_URL` is set, it uses the local SQLite default.
+
 ## Tests
 
 The default test task runs unit and Flask integration tests. Selenium UI tests

@@ -16,7 +16,7 @@ tasks:
       - poetry run flask --app {{.FLASK_APP}} init-db
 
   import-fake-data:
-    desc: Import fake users, follows, posts, comments, and reposts from seed data
+    desc: Import fake seed data into the configured database
     cmds:
       - poetry run python scripts/import_fake_data.py
 
