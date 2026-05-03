@@ -15,6 +15,8 @@ from scripts.import_fake_data import (
     parse_timestamp,
 )
 
+pytestmark = pytest.mark.unit
+
 
 def make_user(username: str) -> User:
     user = User(username=username, email=f"{username}@example.com")

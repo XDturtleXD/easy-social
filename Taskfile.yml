@@ -8,7 +8,7 @@ tasks:
   install:
     desc: Install project dependencies with Poetry
     cmds:
-      - poetry install
+      - poetry install --with dev --no-interaction
 
   init-db:
     desc: Initialize the local SQLite database
@@ -29,6 +29,21 @@ tasks:
     desc: Run the test suite
     cmds:
       - poetry run pytest
+
+  test-unit:
+    desc: Run focused unit tests
+    cmds:
+      - poetry run pytest -m unit
+
+  test-integration:
+    desc: Run Flask integration tests
+    cmds:
+      - poetry run pytest -m integration
+
+  test-ui:
+    desc: Run Selenium UI tests
+    cmds:
+      - poetry run pytest -m ui
 
   shell:
     desc: Open a Poetry shell

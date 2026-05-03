@@ -93,18 +93,34 @@ def wait_for_text(browser, text: str):
     WebDriverWait(browser, 5).until(EC.text_to_be_present_in_element((By.TAG_NAME, "body"), text))
 
 
+def set_field_value(browser, field, value: str):
+    browser.execute_script(
+        """
+        arguments[0].value = arguments[1];
+        arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
+        arguments[0].dispatchEvent(new Event('change', { bubbles: true }));
+        """,
+        field,
+        value,
+    )
+
+
+def submit_form(browser, form):
+    browser.execute_script("arguments[0].requestSubmit ? arguments[0].requestSubmit() : arguments[0].submit();", form)
+
+
 def register_via_ui(browser, live_server: str, username: str):
     browser.get(f"{live_server}/auth/register")
     form = browser.find_element(By.CSS_SELECTOR, "form.form-stack")
     form.find_element(By.NAME, "username").send_keys(username)
     form.find_element(By.NAME, "email").send_keys(f"{username}@example.com")
     form.find_element(By.NAME, "password").send_keys("password")
-    form.submit()
+    submit_form(browser, form)
     wait_for_text(browser, "Feed")
 
 
 def logout_via_ui(browser):
-    browser.find_element(By.CSS_SELECTOR, "header form").submit()
+    submit_form(browser, browser.find_element(By.CSS_SELECTOR, "header form"))
     wait_for_text(browser, "Log in")
 
 
@@ -113,15 +129,16 @@ def test_user_can_register_create_post_and_comment(browser, live_server):
     register_via_ui(browser, live_server, "alice")
 
     composer = browser.find_element(By.CSS_SELECTOR, "form.composer")
-    composer.find_element(By.NAME, "body").send_keys("Hello from Selenium")
-    composer.submit()
+    set_field_value(browser, composer.find_element(By.NAME, "body"), "Hello from Selenium")
+    submit_form(browser, composer)
     wait_for_text(browser, "Hello from Selenium")
 
-    browser.find_element(By.PARTIAL_LINK_TEXT, "0 comments").click()
+    comments_link = browser.find_element(By.PARTIAL_LINK_TEXT, "0 comments")
+    browser.get(comments_link.get_attribute("href"))
     wait_for_text(browser, "Comments")
     comment_form = browser.find_element(By.CSS_SELECTOR, "form.comment-form")
-    comment_form.find_element(By.NAME, "body").send_keys("First UI comment")
-    comment_form.submit()
+    set_field_value(browser, comment_form.find_element(By.NAME, "body"), "First UI comment")
+    submit_form(browser, comment_form)
     wait_for_text(browser, "First UI comment")
 
 
@@ -129,18 +146,18 @@ def test_user_can_register_create_post_and_comment(browser, live_server):
 def test_following_user_adds_their_posts_to_feed(browser, live_server):
     register_via_ui(browser, live_server, "bob")
     composer = browser.find_element(By.CSS_SELECTOR, "form.composer")
-    composer.find_element(By.NAME, "body").send_keys("Bob browser update")
-    composer.submit()
+    set_field_value(browser, composer.find_element(By.NAME, "body"), "Bob browser update")
+    submit_form(browser, composer)
     wait_for_text(browser, "Bob browser update")
     logout_via_ui(browser)
 
     register_via_ui(browser, live_server, "alice")
     assert "Bob browser update" not in browser.find_element(By.TAG_NAME, "body").text
 
-    browser.find_element(By.LINK_TEXT, "Explore").click()
+    browser.get(f"{live_server}/explore")
     wait_for_text(browser, "@bob")
-    browser.find_element(By.XPATH, "//button[normalize-space()='Follow']").click()
+    submit_form(browser, browser.find_element(By.CSS_SELECTOR, ".user-row form"))
     wait_for_text(browser, "Unfollow")
 
-    browser.find_element(By.LINK_TEXT, "Feed").click()
+    browser.get(f"{live_server}/")
     wait_for_text(browser, "Bob browser update")

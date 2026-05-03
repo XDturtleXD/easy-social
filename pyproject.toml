@@ -21,6 +21,8 @@ selenium = "^4.43.0"
 [tool.pytest.ini_options]
 addopts = "-m 'not ui'"
 markers = [
+    "unit: focused unit tests for isolated functions and model behavior",
+    "integration: Flask integration tests that exercise routes or cross-module behavior",
     "ui: browser-based Selenium UI tests",
 ]
 

@@ -2,8 +2,12 @@ from __future__ import annotations
 
 from sqlalchemy.exc import IntegrityError
 
+import pytest
+
 from easy_social.extensions import db
 from easy_social.models import Post, User
+
+pytestmark = pytest.mark.unit
 
 
 def make_user(username: str) -> User:

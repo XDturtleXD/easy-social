@@ -2,10 +2,14 @@ from __future__ import annotations
 
 from io import BytesIO
 
+import pytest
+
 from easy_social.models import Comment, Post, User
 from scripts.import_fake_data import DEFAULT_DATA_DIR, import_fake_data
 
 from conftest import login, logout, register
+
+pytestmark = pytest.mark.integration
 
 
 def test_register_login_and_create_text_post(client, app):

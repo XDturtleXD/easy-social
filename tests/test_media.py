@@ -8,6 +8,8 @@ from werkzeug.datastructures import FileStorage
 
 from easy_social.media import save_media
 
+pytestmark = pytest.mark.unit
+
 
 def make_upload(filename: str, content: bytes = b"file-data") -> FileStorage:
     return FileStorage(stream=BytesIO(content), filename=filename)
