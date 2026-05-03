@@ -93,6 +93,16 @@ def wait_for_text(browser, text: str):
     WebDriverWait(browser, 5).until(EC.text_to_be_present_in_element((By.TAG_NAME, "body"), text))
 
 
+def wait_for_feed(browser):
+    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "form.composer")))
+    wait_for_text(browser, "Feed")
+
+
+def wait_for_login(browser):
+    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.NAME, "username_or_email")))
+    wait_for_text(browser, "Log in")
+
+
 def set_field_value(browser, field, value: str):
     browser.execute_script(
         """
@@ -111,17 +121,19 @@ def submit_form(browser, form):
 
 def register_via_ui(browser, live_server: str, username: str):
     browser.get(f"{live_server}/auth/register")
-    form = browser.find_element(By.CSS_SELECTOR, "form.form-stack")
-    form.find_element(By.NAME, "username").send_keys(username)
-    form.find_element(By.NAME, "email").send_keys(f"{username}@example.com")
-    form.find_element(By.NAME, "password").send_keys("password")
+    form = WebDriverWait(browser, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "form.form-stack"))
+    )
+    set_field_value(browser, form.find_element(By.NAME, "username"), username)
+    set_field_value(browser, form.find_element(By.NAME, "email"), f"{username}@example.com")
+    set_field_value(browser, form.find_element(By.NAME, "password"), "password")
     submit_form(browser, form)
-    wait_for_text(browser, "Feed")
+    wait_for_feed(browser)
 
 
 def logout_via_ui(browser):
     submit_form(browser, browser.find_element(By.CSS_SELECTOR, "header form"))
-    wait_for_text(browser, "Log in")
+    wait_for_login(browser)
 
 
 @pytest.mark.parametrize(
