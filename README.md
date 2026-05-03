@@ -14,10 +14,12 @@ A small Twitter-like social media app built with Flask.
 
 ## Setup
 
+Install Poetry and Task, then install the project dependencies:
+
 ```bash
-poetry install
-poetry run flask --app easy_social init-db
-poetry run flask --app easy_social run
+task install
+task init-db
+task run
 ```
 
 The app uses SQLite by default and creates `instance/easy_social.sqlite`.
@@ -29,18 +31,37 @@ SECRET_KEY=change-me
 DATABASE_URL=sqlite:////absolute/path/to/db.sqlite
 ```
 
+To load sample users, follows, posts, comments, and reposts:
+
+```bash
+task import-fake-data
+```
+
 ## Tests
 
-```bash
-poetry run pytest
-```
-
-Selenium UI tests are excluded from the default suite. They are marked `ui` and
-run against a temporary live Flask server:
+The default test task runs unit and Flask integration tests. Selenium UI tests
+are excluded from the default pytest configuration.
 
 ```bash
-poetry run pytest -m ui
+task test
 ```
 
-By default they use headless Chrome. Set `SELENIUM_BROWSER=firefox` for Firefox or
+Tests are split with pytest markers so new tests can join CI by marker:
+
+```bash
+task test-unit
+task test-integration
+task test-ui
+```
+
+The Selenium UI tests run against a temporary live Flask server. By default they
+use headless Chrome. Set `SELENIUM_BROWSER=firefox` for Firefox or
 `SELENIUM_HEADLESS=0` to watch the browser.
+
+## CI
+
+GitHub Actions runs separate workflows:
+
+- `Unit Tests` installs dependencies with `task install` and runs `task test-unit`.
+- `Integration Tests` installs dependencies with `task install`, runs
+  `task test-integration`, then runs Selenium with `task test-ui`.
