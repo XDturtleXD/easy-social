@@ -35,3 +35,12 @@ DATABASE_URL=sqlite:////absolute/path/to/db.sqlite
 poetry run pytest
 ```
 
+Selenium UI tests are excluded from the default suite. They are marked `ui` and
+run against a temporary live Flask server:
+
+```bash
+poetry run pytest -m ui
+```
+
+By default they use headless Chrome. Set `SELENIUM_BROWSER=firefox` for Firefox or
+`SELENIUM_HEADLESS=0` to watch the browser.

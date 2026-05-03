@@ -16,8 +16,14 @@ python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
+selenium = "^4.43.0"
+
+[tool.pytest.ini_options]
+addopts = "-m 'not ui'"
+markers = [
+    "ui: browser-based Selenium UI tests",
+]
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
