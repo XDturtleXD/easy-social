@@ -71,12 +71,19 @@ def login():
     if request.method == "POST":
         username_or_email = request.form.get("username_or_email", "").strip()
         password = request.form.get("password", "")
+        captcha_answer = request.form.get("captcha_answer", "")
+
+        if not captcha_answer_matches(session.get(CAPTCHA_SESSION_KEY), captcha_answer):
+            flash("Please complete the CAPTCHA challenge.", "error")
+            return render_template("auth/login.html")
+
         user = User.query.filter(
             (User.username == username_or_email)
             | (User.email == username_or_email.lower())
         ).first()
 
         if user and user.check_password(password):
+            session.pop(CAPTCHA_SESSION_KEY, None)
             login_user(user)
             return redirect(url_for("social.feed"))
 

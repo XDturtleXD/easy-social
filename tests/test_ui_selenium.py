@@ -151,6 +151,16 @@ def logout_via_ui(browser):
     wait_for_login(browser)
 
 
+def fill_login_form(browser, live_server: str, username_or_email: str):
+    browser.get(f"{live_server}/auth/login")
+    form = WebDriverWait(browser, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "form.form-stack"))
+    )
+    set_field_value(browser, form.find_element(By.NAME, "username_or_email"), username_or_email)
+    set_field_value(browser, form.find_element(By.NAME, "password"), "password")
+    return form
+
+
 @pytest.mark.parametrize(
     ("filename", "contents", "expected_tag"),
     [
@@ -194,6 +204,21 @@ def test_registration_blocks_submission_without_captcha(browser, live_server, ui
     wait_for_text(browser, "Please complete the CAPTCHA challenge.")
     with ui_app.app_context():
         assert User.query.filter_by(username="bot").first() is None
+
+
+@pytest.mark.ui
+def test_login_blocks_submission_without_captcha(browser, live_server, ui_app):
+    with ui_app.app_context():
+        user = User(username="loginbot", email="loginbot@example.com")
+        user.set_password("password")
+        db.session.add(user)
+        db.session.commit()
+
+    form = fill_login_form(browser, live_server, "loginbot")
+    submit_form_without_browser_validation(browser, form)
+
+    wait_for_text(browser, "Please complete the CAPTCHA challenge.")
+    assert "Feed" not in browser.find_element(By.TAG_NAME, "body").text
 
 
 @pytest.mark.ui

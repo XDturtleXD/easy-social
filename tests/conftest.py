@@ -48,9 +48,14 @@ def register(client, username: str, email: str | None = None, password: str = "p
 
 
 def login(client, username_or_email: str, password: str = "password"):
+    client.get("/auth/captcha.svg")
     return client.post(
         "/auth/login",
-        data={"username_or_email": username_or_email, "password": password},
+        data={
+            "username_or_email": username_or_email,
+            "password": password,
+            "captcha_answer": client.application.config["CAPTCHA_TEST_CODE"],
+        },
         follow_redirects=True,
     )
 

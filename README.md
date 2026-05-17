@@ -5,7 +5,7 @@ A small Twitter-like social media app built with Flask.
 ## Features
 
 - Register, log in, and log out with Flask-Login.
-- CAPTCHA-protected registration to slow automated bot signups.
+- CAPTCHA-protected registration and login to slow automated bot activity.
 - Create posts containing text, images, videos, or a combination.
 - Repost existing posts.
 - Comment on posts.

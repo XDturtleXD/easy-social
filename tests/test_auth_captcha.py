@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from easy_social.extensions import db
 from easy_social.models import User
 
 pytestmark = pytest.mark.integration
@@ -78,3 +79,77 @@ def test_registration_accepts_correct_captcha(client, app):
     assert b"Feed" in response.data
     with app.app_context():
         assert User.query.filter_by(username="alice").one()
+
+
+def test_login_page_includes_captcha_challenge(client):
+    response = client.get("/auth/login")
+
+    assert response.status_code == 200
+    assert b"/auth/captcha.svg" in response.data
+    assert b'name="captcha_answer"' in response.data
+
+
+def test_login_rejects_missing_captcha(client, app):
+    with app.app_context():
+        user = User(username="alice", email="alice@example.com")
+        user.set_password("password")
+        db.session.add(user)
+        db.session.commit()
+
+    response = client.post(
+        "/auth/login",
+        data={
+            "username_or_email": "alice",
+            "password": "password",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert b"Please complete the CAPTCHA challenge." in response.data
+    assert b"Feed" not in response.data
+
+
+def test_login_rejects_wrong_captcha_after_challenge_loaded(client, app):
+    with app.app_context():
+        user = User(username="alice", email="alice@example.com")
+        user.set_password("password")
+        db.session.add(user)
+        db.session.commit()
+    client.get("/auth/captcha.svg")
+
+    response = client.post(
+        "/auth/login",
+        data={
+            "username_or_email": "alice",
+            "password": "password",
+            "captcha_answer": "WRONG",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert b"Please complete the CAPTCHA challenge." in response.data
+    assert b"Feed" not in response.data
+
+
+def test_login_accepts_correct_captcha(client, app):
+    with app.app_context():
+        user = User(username="alice", email="alice@example.com")
+        user.set_password("password")
+        db.session.add(user)
+        db.session.commit()
+    client.get("/auth/captcha.svg")
+
+    response = client.post(
+        "/auth/login",
+        data={
+            "username_or_email": "alice",
+            "password": "password",
+            "captcha_answer": app.config["CAPTCHA_TEST_CODE"],
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert b"Feed" in response.data

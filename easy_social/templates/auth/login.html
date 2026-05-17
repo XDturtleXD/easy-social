@@ -12,6 +12,13 @@
         Password
         <input name="password" type="password" autocomplete="current-password" required>
       </label>
+      <label>
+        CAPTCHA
+        <span class="captcha-box">
+          <img src="{{ url_for('auth.captcha_image') }}" alt="CAPTCHA challenge" width="190" height="72">
+        </span>
+        <input name="captcha_answer" autocomplete="off" inputmode="text" required aria-label="Enter the CAPTCHA text">
+      </label>
       <button type="submit">Log in</button>
     </form>
     <p class="muted">No account? <a href="{{ url_for('auth.register') }}">Create one</a>.</p>
