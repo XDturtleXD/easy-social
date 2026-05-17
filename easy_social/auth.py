@@ -1,12 +1,29 @@
 from __future__ import annotations
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, Response, current_app, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
+from .captcha import (
+    CAPTCHA_SESSION_KEY,
+    captcha_answer_matches,
+    captcha_svg,
+    generate_captcha_code,
+)
 from .extensions import db
 from .models import User
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+
+@bp.get("/captcha.svg")
+def captcha_image():
+    code = current_app.config.get("CAPTCHA_TEST_CODE") or generate_captcha_code(
+        current_app.config["CAPTCHA_LENGTH"]
+    )
+    session[CAPTCHA_SESSION_KEY] = code
+    response = Response(captcha_svg(code), mimetype="image/svg+xml")
+    response.headers["Cache-Control"] = "no-store, max-age=0"
+    return response
 
 
 @bp.route("/register", methods=["GET", "POST"])
@@ -18,10 +35,13 @@ def register():
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
+        captcha_answer = request.form.get("captcha_answer", "")
 
         error = None
         if not username or not email or not password:
             error = "Username, email, and password are required."
+        elif not captcha_answer_matches(session.get(CAPTCHA_SESSION_KEY), captcha_answer):
+            error = "Please complete the CAPTCHA challenge."
         elif len(username) > 40:
             error = "Username must be 40 characters or fewer."
         elif User.query.filter_by(username=username).first():
@@ -32,6 +52,7 @@ def register():
         if error:
             flash(error, "error")
         else:
+            session.pop(CAPTCHA_SESSION_KEY, None)
             user = User(username=username, email=email)
             user.set_password(password)
             db.session.add(user)

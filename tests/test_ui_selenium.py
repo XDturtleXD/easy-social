@@ -33,11 +33,15 @@ def ui_app():
                 "UPLOAD_FOLDER": str(temp_path / "uploads"),
                 "MEDIA_STORAGE_BACKEND": "local",
                 "WTF_CSRF_ENABLED": False,
+                "CAPTCHA_TEST_CODE": "ABC12",
             }
         )
         with app.app_context():
             db.create_all()
         yield app
+        with app.app_context():
+            db.session.remove()
+            db.engine.dispose()
 
 
 @pytest.fixture(scope="module")
@@ -120,7 +124,11 @@ def submit_form(browser, form):
     browser.execute_script("arguments[0].requestSubmit ? arguments[0].requestSubmit() : arguments[0].submit();", form)
 
 
-def register_via_ui(browser, live_server: str, username: str):
+def submit_form_without_browser_validation(browser, form):
+    browser.execute_script("HTMLFormElement.prototype.submit.call(arguments[0]);", form)
+
+
+def fill_registration_form(browser, live_server: str, username: str):
     browser.get(f"{live_server}/auth/register")
     form = WebDriverWait(browser, 10).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, "form.form-stack"))
@@ -128,6 +136,12 @@ def register_via_ui(browser, live_server: str, username: str):
     set_field_value(browser, form.find_element(By.NAME, "username"), username)
     set_field_value(browser, form.find_element(By.NAME, "email"), f"{username}@example.com")
     set_field_value(browser, form.find_element(By.NAME, "password"), "password")
+    return form
+
+
+def register_via_ui(browser, live_server: str, username: str):
+    form = fill_registration_form(browser, live_server, username)
+    set_field_value(browser, form.find_element(By.NAME, "captcha_answer"), "ABC12")
     submit_form(browser, form)
     wait_for_feed(browser)
 
@@ -170,6 +184,16 @@ def test_composer_shows_media_preview_before_posting(
     preview.find_element(By.CSS_SELECTOR, "[data-media-preview-clear]").click()
     WebDriverWait(browser, 5).until(lambda _: not preview.is_displayed())
     assert media_input.get_attribute("value") == ""
+
+
+@pytest.mark.ui
+def test_registration_blocks_submission_without_captcha(browser, live_server, ui_app):
+    form = fill_registration_form(browser, live_server, "bot")
+    submit_form_without_browser_validation(browser, form)
+
+    wait_for_text(browser, "Please complete the CAPTCHA challenge.")
+    with ui_app.app_context():
+        assert User.query.filter_by(username="bot").first() is None
 
 
 @pytest.mark.ui

@@ -20,6 +20,7 @@ def app():
                 "UPLOAD_FOLDER": str(Path(temp_dir) / "uploads"),
                 "MEDIA_STORAGE_BACKEND": "local",
                 "WTF_CSRF_ENABLED": False,
+                "CAPTCHA_TEST_CODE": "ABC12",
             }
         )
         with app.app_context():
@@ -33,12 +34,14 @@ def client(app):
 
 
 def register(client, username: str, email: str | None = None, password: str = "password"):
+    client.get("/auth/captcha.svg")
     return client.post(
         "/auth/register",
         data={
             "username": username,
             "email": email or f"{username}@example.com",
             "password": password,
+            "captcha_answer": client.application.config["CAPTCHA_TEST_CODE"],
         },
         follow_redirects=True,
     )

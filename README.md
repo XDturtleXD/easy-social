@@ -5,6 +5,7 @@ A small Twitter-like social media app built with Flask.
 ## Features
 
 - Register, log in, and log out with Flask-Login.
+- CAPTCHA-protected registration to slow automated bot signups.
 - Create posts containing text, images, videos, or a combination.
 - Repost existing posts.
 - Comment on posts.
@@ -29,7 +30,13 @@ Useful environment variables:
 ```bash
 SECRET_KEY=change-me
 DATABASE_URL=sqlite:////absolute/path/to/db.sqlite
+CAPTCHA_LENGTH=5
 ```
+
+Registration uses a server-generated image CAPTCHA. The expected answer is kept
+in the signed Flask session and is checked again on the server when the
+registration form is submitted. `CAPTCHA_LENGTH` controls the generated code
+length. Tests can set `CAPTCHA_TEST_CODE` to use a deterministic challenge.
 
 ## Vercel and Supabase
 
